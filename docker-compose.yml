@@ -1,0 +1,49 @@
+version: '2'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+        - 80:80
+    links:
+        - php
+    volumes_from:
+      - php
+    volumes:
+        - /c/xampp/htdocs/:/var/www/html
+        - ./nginx:/etc/nginx/conf.d/
+        - ./nginx:/etc/nginx/sites-enabled/
+  php:
+      build: ./php
+      #image: php:5.6-fpm
+      expose:
+          - 9000
+      links:
+          - redis
+          - mysql
+      volumes:
+          - /c/xampp/htdocs/:/var/www/html
+  mysql:
+    image: mysql:5.6
+    expose:
+        - 3306
+    environment:
+     - DB_NAME=distribution
+     - DB_USER=root
+     - DB_PASS=123456
+     - MYSQL_ROOT_PASSWORD=123456
+    #volumes:
+        #- /c/xampp/mysql/data:/var/lib/mysql
+  redis:
+    image: redis:3.2
+    expose: 
+        - 6379
+  phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      ports:
+        - 8081:80
+      links:
+      - mysql
+      environment:
+        - PMA_HOST=mysql
+        - PMA_USER=root
+        - PMA_PASSWORD=123456
